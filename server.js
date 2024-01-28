@@ -6,6 +6,6 @@ const server = app.listen(PORT, () => {
   console.log(`WSV BE ShoeStore ${PORT}`);
 });
 
-// process.env("SIGINT", () => {
+// process.on("SIGINT", () => {
 //   server.close(() => console.log(`Exit server express`));
 // });
