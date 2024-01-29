@@ -1,8 +1,7 @@
 const app = require("./src/app");
 
-const PORT = process.env.PORT || 3056;
+const PORT = process.env.PORT || 3052;
 
-console.log(process.env);
 const server = app.listen(PORT, () => {
   console.log(`WSV BE ShoeStore ${PORT}`);
 });
