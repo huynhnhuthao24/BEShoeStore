@@ -1,10 +1,11 @@
-@url_dev=http://localhost:3052/v1/api
+@url_dev=http://127.0.0.1:3052/v1/api
 ### signup
 POST {{url_dev}}/store/signup
 Content-Type: application/json
+x-api-key: 2f3c6b7b5ccabd02a9150eee5395d1ba2da6a4d32a906882639f2cdd323fe768dd16bc0e0f894a611197546be161cfa1cd6d94f40e1ef3c5d85cff9673266f57
 
 {
     "name":"Store Shoes",
-    "email":"test3s22223@gmail.com",
+    "email":"test2@gmail.com",
     "password":"asdasdasdasdasd"
 }
