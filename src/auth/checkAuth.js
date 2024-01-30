@@ -7,7 +7,7 @@ const HEADER = {
   AUTHORIZATION: "authorization",
 };
 
-const apiKey =async (req, res, next) => {
+const apiKey = async (req, res, next) => {
   try {
     const key = req.headers[HEADER.API_KEY]?.toString();
     if (!key) {
@@ -15,8 +15,8 @@ const apiKey =async (req, res, next) => {
         message: "Forbidden Error",
       });
     }
-    const objKey =await findKeyApi(key);
-    console.log("objKey", objKey,key);
+    const objKey = await findKeyApi(key);
+    console.log("objKey", objKey, key);
     if (!objKey) {
       return res.status(403).json({
         message: "Forbidden Error",
@@ -46,7 +46,13 @@ const validPermission = (permission) => {
   };
 };
 
+const asyncHandle = (fn) => {
+  return (req, res, next) => {
+    fn(req, res, next).catch(next);
+  };
+};
 module.exports = {
   apiKey,
   validPermission,
+  asyncHandle
 };
