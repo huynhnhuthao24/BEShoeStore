@@ -8,6 +8,7 @@ var storeSchema = new Schema(
   {
     name: {
       type: Schema.Types.String,
+      require: true,
       trim: true,
     },
     email: {
@@ -15,18 +16,20 @@ var storeSchema = new Schema(
       trim: true,
       unique: true,
     },
+    password: {
+      type: String,
+      required: true,
+    },
     status: {
       type: Schema.Types.String,
       enum: ["active", "inactive"],
       default: "inactive",
     },
-    verify: {
-      typre: Boolean,
+    isVerify: {
+      type: Boolean,
+      default: false,
     },
-    password: {
-      type: String,
-      required: true,
-    },
+
     roles: {
       typeof: Schema.Types.Array,
       default: [],

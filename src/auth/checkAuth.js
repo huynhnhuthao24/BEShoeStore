@@ -6,7 +6,7 @@ const HEADER = {
   API_KEY: "x-api-key",
   AUTHORIZATION: "authorization",
 };
-
+// check req api key
 const apiKey = async (req, res, next) => {
   try {
     const key = req.headers[HEADER.API_KEY]?.toString();
@@ -28,7 +28,7 @@ const apiKey = async (req, res, next) => {
     console.log(error);
   }
 };
-
+//  validate permisstion 
 const validPermission = (permission) => {
   return (req, res, next) => {
     if (!req.objKey.permissions) {

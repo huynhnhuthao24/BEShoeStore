@@ -4,7 +4,9 @@ const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const KeyTokenService = require("./keyToken.service");
 const { createKeyTokenPair } = require("../auth/authUtil");
-const { BadRequestError } = require("../core/error.response");
+const { BadRequestError, AuthFailureError } = require("../core/error.response");
+const { matchEmail } = require("./store.service");
+
 const roleStore = {
   SHOP: "SHOP",
   WRITE: "WRITE",
@@ -12,11 +14,56 @@ const roleStore = {
   ADMIN: "AMDIN",
 };
 class AccessService {
+  static signInService = async ({ email, password, refreshToken = null }) => {
+    // check email
+    const store = await matchEmail({ email });
+    if (!store) {
+      throw new BadRequestError("Error: Shop Not Exist");
+    }
+    // check password request to password DB
+    const match = await bcrypt.compare(password, store.password);
+    if (!match) {
+      throw new AuthFailureError("Authentication Error");
+    }
+    // create Token
+    const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa", {
+      modulusLength: 4096,
+      publicKeyEncoding: {
+        type: "pkcs1",
+        format: "pem",
+      },
+      privateKeyEncoding: {
+        type: "pkcs1",
+        format: "pem",
+      },
+    });
+    const publicKeyObject = crypto.createPublicKey(publicKey.toString());
+    //  generate Token
+    const tokenPairs = await createKeyTokenPair(
+      { userId: store._id, email },
+      publicKeyObject,
+      privateKey
+    );
+    await KeyTokenService.createKeyToken({
+      userId: store._id,
+      refreshToken: tokenPairs.refreshToken,
+      privateKey,
+      publicKey,
+    });
+    return {
+      store: getInfoData({
+        fields: ["_id", "name", "email"],
+        object: store,
+      }),
+      tokenPairs,
+    };
+  };
+
   static signUpService = async ({ name, email, password }) => {
     // check email
     const holderStore = await storeModel.findOne({ email }).lean();
     if (holderStore) {
-      throw new BadRequestError("Error: Shop Already Register");
+      throw new BadRequestError("Error: Store Already Register");
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
@@ -26,7 +73,7 @@ class AccessService {
       email,
       password: passwordHash,
       status: "inactive",
-      verify: false,
+      isVerify: false,
       roles: [roleStore.SHOP],
     });
     if (newStore) {
@@ -46,6 +93,7 @@ class AccessService {
       const publicKeyString = await KeyTokenService.createKeyToken({
         userId: newStore._id,
         publicKey,
+        privateKey
       });
 
       if (!publicKeyString) {
@@ -61,14 +109,11 @@ class AccessService {
       );
 
       return {
-        code: 201,
-        metadata: {
-          store: getInfoData({
-            fields: ["_id", "name", "email"],
-            object: newStore,
-          }),
-          tokenPairs,
-        },
+        store: getInfoData({
+          fields: ["_id", "name", "email"],
+          object: newStore,
+        }),
+        tokenPairs,
       };
     }
     return {

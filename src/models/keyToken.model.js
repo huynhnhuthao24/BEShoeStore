@@ -16,9 +16,17 @@ var keyTokenSchema = new Schema(
       type: Schema.Types.String,
       require: true,
     },
-    refreshToken: {
+    privateKey:{
+      type: Schema.Types.String,
+      require: true,
+    },
+    refreshTokensUsed: {
       type: Schema.Types.Array,
       default: [],
+    },
+    refreshToken: {
+      type: String,
+      require: true,
     },
   },
   {
