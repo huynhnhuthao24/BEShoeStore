@@ -14,6 +14,12 @@ const roleStore = {
   ADMIN: "AMDIN",
 };
 class AccessService {
+
+  static logOutService = async ({keyStore}) =>{
+    const deleteKey = await KeyTokenService.removeKeyStoreId(keyStore._id)
+    return deleteKey
+  }
+
   static signInService = async ({ email, password, refreshToken = null }) => {
     // check email
     const store = await matchEmail({ email });
