@@ -55,10 +55,14 @@ const authentication = asyncHandle(async (req, res, next) => {
   // 4 - check user in db
   // 5 - check key store with this userId
   // 6 - Ok all => return next()
-  
 });
+
+const verifyToken = async (token, ketSecret) => {
+  return await JWT.verify(token, ketSecret);
+};
 
 module.exports = {
   createKeyTokenPair,
   authentication,
+  verifyToken,
 };

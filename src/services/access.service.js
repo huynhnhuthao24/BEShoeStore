@@ -3,8 +3,12 @@ const { getInfoData } = require("../utils");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const KeyTokenService = require("./keyToken.service");
-const { createKeyTokenPair } = require("../auth/authUtil");
-const { BadRequestError, AuthFailureError } = require("../core/error.response");
+const { createKeyTokenPair, verifyToken } = require("../auth/authUtil");
+const {
+  BadRequestError,
+  AuthFailureError,
+  ForbbidenError,
+} = require("../core/error.response");
 const { matchEmail } = require("./store.service");
 
 const roleStore = {
@@ -14,11 +18,60 @@ const roleStore = {
   ADMIN: "AMDIN",
 };
 class AccessService {
+  static handleRefreshToken = async (refreshToken) => {
+    // check refresh token đã sử dụng chưa
+    const findToken = await KeyTokenService.findByTokenUsed(refreshToken);
+    if (findToken) {
+      // verify Token
+      const { userId, email } = await verifyToken(
+        refreshToken,
+        findToken.privateKey
+      );
+      console.log("userId, email", userId, email);
+      // xóa key
+      await KeyTokenService.deleteKeyById(userId);
+      throw new ForbbidenError(
+        "Phiên bản đăng nhập hết hạn,vui lòng đăng nhập lại"
+      );
+    }
+    const holderToken = await KeyTokenService.findByRefreshToken(refreshToken);
+    if (!holderToken) {
+      throw new AuthFailureError("Store Not Register 1");
+    }
+    // verifyToken
+    const { userId, email } = await verifyToken(
+      refreshToken,
+      holderToken.privateKey
+    );
+    const findStore = await matchEmail({ email });
+    if (!findStore) throw new AuthFailureError("Store Not Register 2");
+    // create new token
+    const tokenPairs = await createKeyTokenPair(
+      { userId: userId, email },
+      holderToken.publicKey,
+      holderToken.privateKey
+    );
+    await holderToken.updateOne({
+      $set: {
+        refreshToken: tokenPairs.refreshToken,
+      },
+      $addToSet: {
+        refreshTokensUsed: refreshToken, // refreshToken này đã được sử dụng
+      },
+    });
+    return {
+      user: {
+        userId,
+        email,
+      },
+      tokenPairs,
+    };
+  };
 
-  static logOutService = async ({keyStore}) =>{
-    const deleteKey = await KeyTokenService.removeKeyStoreId(keyStore._id)
-    return deleteKey
-  }
+  static logOutService = async ({ keyStore }) => {
+    const deleteKey = await KeyTokenService.removeKeyStoreId(keyStore._id);
+    return deleteKey;
+  };
 
   static signInService = async ({ email, password, refreshToken = null }) => {
     // check email
@@ -99,7 +152,7 @@ class AccessService {
       const publicKeyString = await KeyTokenService.createKeyToken({
         userId: newStore._id,
         publicKey,
-        privateKey
+        privateKey,
       });
 
       if (!publicKeyString) {
