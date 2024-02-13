@@ -18,40 +18,26 @@ const roleStore = {
   ADMIN: "AMDIN",
 };
 class AccessService {
-  static handleRefreshToken = async (refreshToken) => {
-    // check refresh token đã sử dụng chưa
-    const findToken = await KeyTokenService.findByTokenUsed(refreshToken);
-    if (findToken) {
-      // verify Token
-      const { userId, email } = await verifyToken(
-        refreshToken,
-        findToken.privateKey
-      );
-      console.log("userId, email", userId, email);
-      // xóa key
+  static handleRefreshToken = async ({ keyStore, user, refreshToken }) => {
+    const { userId, email } = user;
+    if (keyStore.refreshTokensUsed.includes(refreshToken)) {
       await KeyTokenService.deleteKeyById(userId);
       throw new ForbbidenError(
         "Phiên bản đăng nhập hết hạn,vui lòng đăng nhập lại"
       );
     }
-    const holderToken = await KeyTokenService.findByRefreshToken(refreshToken);
-    if (!holderToken) {
-      throw new AuthFailureError("Store Not Register 1");
+    if (keyStore.refreshToken !== refreshToken) {
+      new AuthFailureError("Store Not Register ");
     }
-    // verifyToken
-    const { userId, email } = await verifyToken(
-      refreshToken,
-      holderToken.privateKey
-    );
     const findStore = await matchEmail({ email });
     if (!findStore) throw new AuthFailureError("Store Not Register 2");
     // create new token
     const tokenPairs = await createKeyTokenPair(
       { userId: userId, email },
-      holderToken.publicKey,
-      holderToken.privateKey
+      keyStore.publicKey,
+      keyStore.privateKey
     );
-    await holderToken.updateOne({
+    await keyStore.updateOne({
       $set: {
         refreshToken: tokenPairs.refreshToken,
       },
@@ -60,10 +46,7 @@ class AccessService {
       },
     });
     return {
-      user: {
-        userId,
-        email,
-      },
+      user,
       tokenPairs,
     };
   };
