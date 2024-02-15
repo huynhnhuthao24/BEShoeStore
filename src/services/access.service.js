@@ -92,16 +92,17 @@ class AccessService {
       privateKey,
       publicKey,
     });
+    console.log("ádasdasd", store);
     return {
       store: getInfoData({
-        fields: ["_id", "name", "email"],
+        fields: ["_id", "name", "email", "phone"],
         object: store,
       }),
       tokenPairs,
     };
   };
 
-  static signUpService = async ({ name, email, password }) => {
+  static signUpService = async ({ name, email, password, phone }) => {
     // check email
     const holderStore = await storeModel.findOne({ email }).lean();
     if (holderStore) {
@@ -114,6 +115,7 @@ class AccessService {
       name,
       email,
       password: passwordHash,
+      phone,
       status: "inactive",
       isVerify: false,
       roles: [roleStore.SHOP],
@@ -152,7 +154,7 @@ class AccessService {
 
       return {
         store: getInfoData({
-          fields: ["_id", "name", "email"],
+          fields: ["_id", "name", "email", "phone"],
           object: newStore,
         }),
         tokenPairs,

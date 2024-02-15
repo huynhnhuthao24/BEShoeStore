@@ -20,6 +20,7 @@ var storeSchema = new Schema(
       type: String,
       required: true,
     },
+    phone: { type: String, require: true },
     status: {
       type: Schema.Types.String,
       enum: ["active", "inactive"],
@@ -29,7 +30,6 @@ var storeSchema = new Schema(
       type: Boolean,
       default: false,
     },
-
     roles: {
       typeof: Schema.Types.Array,
       default: [],

@@ -15,7 +15,7 @@ class ProductFactory {
   static async createProduct(type, payload) {
     switch (type) {
       case "Electonics":
-        return new Electronics(payload);
+        return new Electronics(payload).createProduct();
       case "Clothes":
         return new Clothing(payload).createProduct();
       default:
@@ -44,17 +44,20 @@ class Product {
     this.product_store = product_store;
     this.product_attributes = product_attributes;
   }
-  async createProduct() {
-    return await product.create(this);
+  async createProduct(product_id) {
+    return await product.create({ ...this, _id: product_id });
   }
 }
 // define sub-class
 class Clothing extends Product {
   async createProduct() {
-    const newClothing = await clothing.create(this.product_attributes);
+    const newClothing = await clothing.create({
+      ...this.product_attributes,
+      product_store: this.product_store,
+    });
     if (!newClothing) throw new BadRequestError("Thêm sản phẩm thất bại");
 
-    const newProduct = await super.createProduct();
+    const newProduct = await super.createProduct(newClothing._id);
     if (!newProduct) throw new BadRequestError("Thêm sản phẩm thất bại");
     return newProduct;
   }
@@ -62,10 +65,13 @@ class Clothing extends Product {
 
 class Electronics extends Product {
   async createProduct() {
-    const newClothing = await electronic.create(this.product_attributes);
-    if (!newClothing) throw new BadRequestError("Thêm sản phẩm thất bại");
+    const newElectronic = await electronic.create({
+      ...this.product_attributes,
+      product_store: this.product_store,
+    });
+    if (!newElectronic) throw new BadRequestError("Thêm sản phẩm thất bại");
 
-    const newProduct = await super.createProduct();
+    const newProduct = await super.createProduct(newElectronic._id);
     if (!newProduct) throw new BadRequestError("Thêm sản phẩm thất bại");
     return newProduct;
   }

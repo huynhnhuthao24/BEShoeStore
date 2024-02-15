@@ -8,10 +8,10 @@ class ProductController {
   createProduct = async (req, res, next) => {
     new SuccessResponse({
       message: "Tạo sản phẩm thành công",
-      metadata: await ProductService.createProduct(
-        req.body.product_type,
-        req.body
-      ),
+      metadata: await ProductService.createProduct(req.body.product_type, {
+        ...req.body,
+        product_store,
+      }),
     }).send(res);
   };
 }

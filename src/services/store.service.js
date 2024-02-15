@@ -8,6 +8,7 @@ const matchEmail = async ({
     email: 1,
     password: 2,
     name: 1,
+    phone: 1,
     status: 1,
     roles: 1,
   },

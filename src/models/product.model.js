@@ -53,6 +53,10 @@ const clothingModel = new mongoose.Schema(
     size: String,
     material: String,
     color: String,
+    product_store: {
+      type: mongoose.Schema.ObjectId,
+      ref: "Store",
+    },
   },
   {
     timestamps: true,
@@ -64,6 +68,10 @@ const electronicModel = new mongoose.Schema(
     manufacturer: { type: String, require: true },
     model: String,
     color: String,
+    product_store: {
+      type: mongoose.Schema.ObjectId,
+      ref: "Store",
+    },
   },
   {
     timestamps: true,
