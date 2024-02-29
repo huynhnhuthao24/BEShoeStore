@@ -5,6 +5,7 @@ const {
   electronic: electronic,
   product: product,
   clothing: clothing,
+  funiture: funiture,
 } = require("../models/product.model");
 // define Factory class to create Product
 class ProductFactory {
@@ -12,15 +13,14 @@ class ProductFactory {
         type: 'Clothing',
         payload:data
     */
+  static productRegister = {};
+  static registerProductType(type, classRef) {
+    ProductFactory.productRegister[type] = classRef;
+  }
   static async createProduct(type, payload) {
-    switch (type) {
-      case "Electonics":
-        return new Electronics(payload).createProduct();
-      case "Clothes":
-        return new Clothing(payload).createProduct();
-      default:
-        throw new BadRequestError(`Invalid Product Type ${type}`);
-    }
+    const productClass = ProductFactory.productRegister[type];
+    if (productClass) throw new BadRequestError(`Invalid Type ${type}`);
+    return new productClass(payload).createProduct();
   }
 }
 // define base product class
@@ -76,5 +76,23 @@ class Electronics extends Product {
     return newProduct;
   }
 }
+
+class Funitures extends Product {
+  async createProduct() {
+    const newFuniture = await funiture.create({
+      ...this.product_attributes,
+      product_store: this.product_store,
+    });
+    if (!newFuniture) throw new BadRequestError("Thêm sản phẩm thất bại");
+
+    const newProduct = await super.createProduct(newFuniture._id);
+    if (!newProduct) throw new BadRequestError("Thêm sản phẩm thất bại");
+    return newProduct;
+  }
+}
+
+ProductFactory.registerProductType("Clothing", Clothing);
+ProductFactory.registerProductType("Electronics", Electronics);
+ProductFactory.registerProductType("Funitures", Funitures);
 
 module.exports = ProductFactory;

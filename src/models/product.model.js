@@ -78,9 +78,26 @@ const electronicModel = new mongoose.Schema(
     collection: "Electronics",
   }
 );
+const funitureModel = new mongoose.Schema(
+  {
+    brand: { type: String, require: true },
+    size: String,
+    material: String,
+    color: String,
+    product_store: {
+      type: mongoose.Schema.ObjectId,
+      ref: "Store",
+    },
+  },
+  {
+    timestamps: true,
+    collection: "Clothes",
+  }
+);
 //Export the model
 module.exports = {
   product: mongoose.model(DOCUMENT_NAME, productModel),
   clothing: mongoose.model("Clothes", clothingModel),
   electronic: mongoose.model("Electronics", electronicModel),
+  funiture: mongoose.model("Funitures", funitureModel),
 };
