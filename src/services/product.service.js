@@ -8,7 +8,11 @@ const {
   clothing: clothing,
   funiture: funiture,
 } = require("../models/product.model");
-const { findAllDraftStore } = require("../models/repository/product.repo");
+const {
+  findAllDraftStore,
+  publishProduct,
+  findAllPublishProduct,
+} = require("../models/repository/product.repo");
 // define Factory class to create Product
 class ProductFactory {
   /*
@@ -26,10 +30,10 @@ class ProductFactory {
     return new productClass(payload).createProduct();
   }
   // PUT
-  // static async publishProduct({ product_store, product_id }) {
-  //   const store = await product.
-  // }
-  //
+  static async publishProduct({ product_store, product_id }) {
+    return await publishProduct({ product_store, product_id });
+  }
+
   // query
   static async findAllDraftStore({ product_store, limit = 50, skip = 0 }) {
     const query = {
@@ -37,6 +41,13 @@ class ProductFactory {
       isDraft: true,
     };
     return await findAllDraftStore({ query, limit, skip });
+  }
+  static async findAllPublishProduct({ product_store, limit = 50, skip = 0 }) {
+    const query = {
+      product_store,
+      isPublished: true,
+    };
+    return await findAllPublishProduct({ query, limit, skip });
   }
   //
 }

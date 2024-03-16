@@ -10,6 +10,10 @@ router.use(authentication);
 //
 router.post("", asyncHandle(ProductController.createProduct));
 // Query
-router.post("/draft/allProducts", asyncHandle(ProductController.getAllDratf));
+router.get("/draft/allProducts", asyncHandle(ProductController.getAllDratf));
+router.get(
+  "/publish/allProducts",
+  asyncHandle(ProductController.getAllPublishProduct)
+);
 
 module.exports = router;

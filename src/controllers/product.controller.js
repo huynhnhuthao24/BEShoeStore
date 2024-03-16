@@ -29,6 +29,21 @@ class ProductController {
       }),
     }).send(res);
   };
+  /**
+   * @description Lấy tất cả sp đã publish
+   * @param {Number} limit
+   * @param {Number} skip
+   * @returns {JSON}
+   *
+   */
+  getAllPublishProduct = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Lấy sản phẩm thành công",
+      metadata: await ProductService.findAllPublishProduct({
+        product_store: req.keyStore.user,
+      }),
+    }).send(res);
+  };
 }
 
 module.exports = new ProductController();

@@ -59,7 +59,7 @@ const productModel = new mongoose.Schema(
     },
     isPublished: {
       type: Boolean,
-      default: true,
+      default: false,
       index: true,
       select: false,
     },
