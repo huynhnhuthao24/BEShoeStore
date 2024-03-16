@@ -1,5 +1,6 @@
 "use strict";
 
+const { Types } = require("mongoose");
 const { BadRequestError } = require("../core/error.response");
 const {
   electronic: electronic,
@@ -7,6 +8,7 @@ const {
   clothing: clothing,
   funiture: funiture,
 } = require("../models/product.model");
+const { findAllDraftStore } = require("../models/repository/product.repo");
 // define Factory class to create Product
 class ProductFactory {
   /*
@@ -17,11 +19,26 @@ class ProductFactory {
   static registerProductType(type, classRef) {
     ProductFactory.productRegister[type] = classRef;
   }
-  static async createProduct(type, payload) {
+  static async factoryCreate(type, payload) {
     const productClass = ProductFactory.productRegister[type];
-    if (productClass) throw new BadRequestError(`Invalid Type ${type}`);
+
+    if (!productClass) throw new BadRequestError(`Invalid Type ${type}`);
     return new productClass(payload).createProduct();
   }
+  // PUT
+  // static async publishProduct({ product_store, product_id }) {
+  //   const store = await product.
+  // }
+  //
+  // query
+  static async findAllDraftStore({ product_store, limit = 50, skip = 0 }) {
+    const query = {
+      product_store,
+      isDraft: true,
+    };
+    return await findAllDraftStore({ query, limit, skip });
+  }
+  //
 }
 // define base product class
 class Product {
@@ -91,7 +108,7 @@ class Funitures extends Product {
   }
 }
 
-ProductFactory.registerProductType("Clothing", Clothing);
+ProductFactory.registerProductType("Clothes", Clothing);
 ProductFactory.registerProductType("Electronics", Electronics);
 ProductFactory.registerProductType("Funitures", Funitures);
 
