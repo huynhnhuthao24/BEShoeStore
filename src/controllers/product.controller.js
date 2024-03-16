@@ -44,6 +44,15 @@ class ProductController {
       }),
     }).send(res);
   };
+  publishProduct = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Lấy sản phẩm thành công",
+      metadata: await ProductService.publishProduct({
+        product_store: req.keyStore.user,
+        product_id: req.body.product_id,
+      }),
+    }).send(res);
+  };
 }
 
 module.exports = new ProductController();
