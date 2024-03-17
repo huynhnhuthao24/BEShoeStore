@@ -9,17 +9,24 @@ const findAllDraftStore = async ({ query, limit = 50, skip = 0 }) => {
 const findAllPublishProduct = async ({ query, limit = 50, skip = 0 }) => {
   return await queryProduct({ query, limit, skip });
 };
-const publishProduct = async ({ product_store, product_id }) => {
-  const findStore = await product
-    .findOne({
-      product_store: new Types.ObjectId(product_store),
-      _id: new Types.ObjectId(product_id),
-    })
-    .lean();
+const publishOrUnPublishProduct = async ({
+  product_store,
+  product_id,
+  unPublish = false,
+}) => {
+  const findStore = await product.findOne({
+    product_store: new Types.ObjectId(product_store),
+    _id: new Types.ObjectId(product_id),
+  });
   if (!findStore) return null;
-  findStore.isDraft = false;
-  findStore.isPublished = true;
-  const { modifiedCount } = await findStore.update(findStore);
+  if (unPublish) {
+    findStore.isDraft = true;
+    findStore.isPublished = false;
+  } else {
+    findStore.isDraft = false;
+    findStore.isPublished = true;
+  }
+  const { modifiedCount } = await findStore.updateOne(findStore);
   return modifiedCount;
 };
 
@@ -35,9 +42,21 @@ const queryProduct = async ({ query, limit, skip }) => {
     .lean()
     .exec();
 };
+const searchProduct = async ({ keyWord }) => {
+  const regexSearch = new RegExp(keyWord);
+  const result = await product
+    .find(
+      { isDraft: false, $text: { $search: regexSearch } },
+      { score: { $meta: "textScore" } }
+    )
+    .sort({ score: { $meta: "textScore" } })
+    .lean();
+  return result;
+};
 
 module.exports = {
   findAllDraftStore,
-  publishProduct,
+  publishOrUnPublishProduct,
   findAllPublishProduct,
+  searchProduct,
 };

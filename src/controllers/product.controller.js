@@ -46,11 +46,27 @@ class ProductController {
   };
   publishProduct = async (req, res, next) => {
     new SuccessResponse({
-      message: "Lấy sản phẩm thành công",
+      message: "Publish sản phẩm thành công",
       metadata: await ProductService.publishProduct({
         product_store: req.keyStore.user,
         product_id: req.body.product_id,
       }),
+    }).send(res);
+  };
+  unPublishProduct = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Publish sản phẩm thành công",
+      metadata: await ProductService.unPublishProduct({
+        product_store: req.keyStore.user,
+        product_id: req.body.product_id,
+      }),
+    }).send(res);
+  };
+  searchProducts = async (req, res, next) => {
+    console.log("req.params", req.params);
+    new SuccessResponse({
+      // message: "Publish sản phẩm thành công",
+      metadata: await ProductService.searchProducts(req.params),
     }).send(res);
   };
 }

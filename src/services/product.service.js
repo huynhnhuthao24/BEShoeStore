@@ -10,8 +10,9 @@ const {
 } = require("../models/product.model");
 const {
   findAllDraftStore,
-  publishProduct,
   findAllPublishProduct,
+  publishOrUnPublishProduct,
+  searchProduct,
 } = require("../models/repository/product.repo");
 // define Factory class to create Product
 class ProductFactory {
@@ -29,9 +30,21 @@ class ProductFactory {
     if (!productClass) throw new BadRequestError(`Invalid Type ${type}`);
     return new productClass(payload).createProduct();
   }
-  // PUT
+  // Publish Product
   static async publishProduct({ product_store, product_id }) {
-    return await publishProduct({ product_store, product_id });
+    return await publishOrUnPublishProduct({ product_store, product_id });
+  }
+  // unPublish Product
+  static async unPublishProduct({
+    product_store,
+    product_id,
+    unPublish = true,
+  }) {
+    return await publishOrUnPublishProduct({
+      product_store,
+      product_id,
+      unPublish,
+    });
   }
 
   // query
@@ -49,7 +62,17 @@ class ProductFactory {
     };
     return await findAllPublishProduct({ query, limit, skip });
   }
-  //
+  // search Product
+  static async findAllDraftStore({ product_store, limit = 50, skip = 0 }) {
+    const query = {
+      product_store,
+      isDraft: true,
+    };
+    return await findAllDraftStore({ query, limit, skip });
+  }
+  static async searchProducts({ keyWord }) {
+    return await searchProduct({ keyWord });
+  }
 }
 // define base product class
 class Product {

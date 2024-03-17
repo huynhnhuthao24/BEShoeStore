@@ -78,6 +78,8 @@ productModel.pre("save", function (next) {
   this.product_slug = slugify(this.product_name, { lower: true });
   next();
 });
+//  create index search
+productModel.index({ product_name: "text", product_description: "text" });
 
 const clothingModel = new mongoose.Schema(
   {
