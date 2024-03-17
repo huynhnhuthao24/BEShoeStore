@@ -69,6 +69,22 @@ class ProductController {
       metadata: await ProductService.searchProducts(req.params),
     }).send(res);
   };
+  findAllProduct = async (req, res, next) => {
+    console.log("req.params", req.params);
+    new SuccessResponse({
+      message: "Lấy dữ liệu thành công",
+      metadata: await ProductService.findAllProducts(req.query),
+    }).send(res);
+  };
+  getProductDetail = async (req, res, next) => {
+    console.log("req.params", req.params);
+    new SuccessResponse({
+      message: "Lấy dữ liệu thành công",
+      metadata: await ProductService.productDetail({
+        product_id: req.params.product_id,
+      }),
+    }).send(res);
+  };
 }
 
 module.exports = new ProductController();
