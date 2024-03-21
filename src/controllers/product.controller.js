@@ -14,6 +14,7 @@ class ProductController {
       }),
     }).send(res);
   };
+
   /**
    * @description Lấy tất cả sp nháp
    * @param {Number} limit
@@ -29,6 +30,7 @@ class ProductController {
       }),
     }).send(res);
   };
+
   /**
    * @description Lấy tất cả sp đã publish
    * @param {Number} limit
@@ -44,45 +46,61 @@ class ProductController {
       }),
     }).send(res);
   };
+
   publishProduct = async (req, res, next) => {
     new SuccessResponse({
       message: "Publish sản phẩm thành công",
       metadata: await ProductService.publishProduct({
-        product_store: req.keyStore.user,
+        product_store: req.user.userId,
         product_id: req.body.product_id,
       }),
     }).send(res);
   };
+
   unPublishProduct = async (req, res, next) => {
     new SuccessResponse({
-      message: "Publish sản phẩm thành công",
+      message: "UnPublish sản phẩm thành công",
       metadata: await ProductService.unPublishProduct({
-        product_store: req.keyStore.user,
+        product_store: req.user.userId,
         product_id: req.body.product_id,
       }),
     }).send(res);
   };
+
   searchProducts = async (req, res, next) => {
-    console.log("req.params", req.params);
     new SuccessResponse({
       // message: "Publish sản phẩm thành công",
       metadata: await ProductService.searchProducts(req.params),
     }).send(res);
   };
+
   findAllProduct = async (req, res, next) => {
-    console.log("req.params", req.params);
     new SuccessResponse({
       message: "Lấy dữ liệu thành công",
       metadata: await ProductService.findAllProducts(req.query),
     }).send(res);
   };
+
   getProductDetail = async (req, res, next) => {
-    console.log("req.params", req.params);
     new SuccessResponse({
       message: "Lấy dữ liệu thành công",
       metadata: await ProductService.productDetail({
         product_id: req.params.product_id,
       }),
+    }).send(res);
+  };
+
+  updateProduct = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Cập nhật sản phẩm thành công",
+      metadata: await ProductService.updateProduct(
+        req.body.product_type,
+        req.params.product_id,
+        {
+          ...req.body,
+          product_store: req.user.userId,
+        }
+      ),
     }).send(res);
   };
 }

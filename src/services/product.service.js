@@ -15,7 +15,9 @@ const {
   searchProduct,
   findAllProduct,
   findProduct,
+  updateProductById,
 } = require("../models/repository/product.repo");
+const { removeNullOrUndefined, updateNestedObjectParse } = require("../utils");
 // define Factory class to create Product
 class ProductFactory {
   /*
@@ -32,10 +34,26 @@ class ProductFactory {
     if (!productClass) throw new BadRequestError(`Invalid Type ${type}`);
     return new productClass(payload).createProduct();
   }
+
+  static async factoryCreate(type, payload) {
+    const productClass = ProductFactory.productRegister[type];
+
+    if (!productClass) throw new BadRequestError(`Invalid Type ${type}`);
+    return new productClass(payload).createProduct();
+  }
+
+  static async updateProduct(type, productId, payload) {
+    const productClass = ProductFactory.productRegister[type];
+
+    if (!productClass) throw new BadRequestError(`Invalid Type ${type}`);
+    return new productClass(payload).updateProduct(productId);
+  }
+
   // Publish Product
   static async publishProduct({ product_store, product_id }) {
     return await publishOrUnPublishProduct({ product_store, product_id });
   }
+
   // unPublish Product
   static async unPublishProduct({
     product_store,
@@ -57,6 +75,7 @@ class ProductFactory {
     };
     return await findAllDraftStore({ query, limit, skip });
   }
+
   static async findAllPublishProduct({ product_store, limit = 50, skip = 0 }) {
     const query = {
       product_store,
@@ -64,6 +83,7 @@ class ProductFactory {
     };
     return await findAllPublishProduct({ query, limit, skip });
   }
+
   // search Product
   static async findAllDraftStore({ product_store, limit = 50, skip = 0 }) {
     const query = {
@@ -72,9 +92,11 @@ class ProductFactory {
     };
     return await findAllDraftStore({ query, limit, skip });
   }
+
   static async searchProducts({ keyWord }) {
     return await searchProduct({ keyWord });
   }
+
   static async findAllProducts({
     limit = 50,
     sort = "ctime",
@@ -89,6 +111,7 @@ class ProductFactory {
       select: ["product_name", "product_price", "product_thumb"],
     });
   }
+
   static async productDetail({ product_id }) {
     return await findProduct({
       product_id,
@@ -120,6 +143,13 @@ class Product {
   async createProduct(product_id) {
     return await product.create({ ...this, _id: product_id });
   }
+  async updateProduct(productId, objectPayload) {
+    return await updateProductById({
+      productId,
+      objectPayload,
+      model: product,
+    });
+  }
 }
 // define sub-class
 class Clothing extends Product {
@@ -133,6 +163,21 @@ class Clothing extends Product {
     const newProduct = await super.createProduct(newClothing._id);
     if (!newProduct) throw new BadRequestError("Thêm sản phẩm thất bại");
     return newProduct;
+  }
+  async updateProduct(productId) {
+    const objectPayload = removeNullOrUndefined(this);
+    if (objectPayload.product_attributes) {
+      await updateProductById({
+        productId,
+        objectPayload: updateNestedObjectParse(objectPayload),
+        model: clothing,
+      });
+    }
+    const updateProduct = await super.updateProduct(
+      productId,
+      updateNestedObjectParse(objectPayload)
+    );
+    return updateProduct;
   }
 }
 

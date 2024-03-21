@@ -15,6 +15,10 @@ router.get(
 router.use(authentication);
 //
 router.post("/createProduct", asyncHandle(ProductController.createProduct));
+router.patch(
+  "/updateProduct/:product_id",
+  asyncHandle(ProductController.updateProduct)
+);
 router.post("/publish", asyncHandle(ProductController.publishProduct));
 router.post("/unPublish", asyncHandle(ProductController.unPublishProduct));
 // Query
