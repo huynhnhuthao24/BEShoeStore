@@ -105,8 +105,12 @@ class AccessService {
   static signUpService = async ({ name, email, password, phone }) => {
     // check email
     const holderStore = await storeModel.findOne({ email }).lean();
+    const storeName = await storeModel.findOne({ name }).lean();
     if (holderStore) {
-      throw new BadRequestError("Error: Store Already Register");
+      throw new BadRequestError("Email này đã tồn tại!");
+    }
+    if (storeName) {
+      throw new BadRequestError("Tên này đã tồn tại!");
     }
 
     const passwordHash = await bcrypt.hash(password, 10);

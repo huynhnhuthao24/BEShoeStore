@@ -34,7 +34,7 @@ const publishOrUnPublishProduct = async ({
 const queryProduct = async ({ query, limit, skip }) => {
   return await product
     .find(query)
-    .populate("product_store", "name email -_id")
+    // .populate("product_store", "name email -_id")
     .sort({
       updateAt: -1,
     })
