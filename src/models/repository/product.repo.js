@@ -5,6 +5,8 @@ const { product } = require("../product.model");
 const { Types } = require("mongoose");
 
 const findAllDraftStore = async ({ query, limit = 50, skip = 0 }) => {
+  const test = await queryProduct({ query, limit, skip });
+  console.log("test", test);
   return await queryProduct({ query, limit, skip });
 };
 const findAllPublishProduct = async ({ query, limit = 50, skip = 0 }) => {
@@ -32,7 +34,7 @@ const publishOrUnPublishProduct = async ({
 };
 
 const queryProduct = async ({ query, limit, skip }) => {
-  return await product
+  const data = await product
     .find(query)
     .populate("product_store", "name email -_id")
     .sort({
@@ -42,6 +44,11 @@ const queryProduct = async ({ query, limit, skip }) => {
     .limit(limit)
     .lean()
     .exec();
+  const totalCount = await product.countDocuments(query);
+  return {
+    product: data,
+    totalCount,
+  };
 };
 const findAllProduct = async ({ limit, sort, page, filter, select }) => {
   const skip = (page - 1) * limit;

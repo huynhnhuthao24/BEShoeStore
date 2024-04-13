@@ -13,7 +13,7 @@ const STAG = {
     port: process.env.STAG_APP_PORT || 3000,
   },
   db: {
-    host: process.env.STAG_DB_HOST || "localhost",
+    host: process.env.STAG_DB_HOST || "127.0.0.1",
     port: process.env.STAG_DB_PORT || 27017,
     name: process.env.STAG_DB_NAME || "StagShoeStore",
   },

@@ -2,7 +2,7 @@
 ### signup
 POST {{url_dev}}/store/signup
 Content-Type: application/json
-x-api-key: 4441e9d73efa0e5ec89b99993e782dce8d4a82db8d5dfbc235684cd6259d954bd5ddc970009708e470f423f93e0d0ddfd9e8d71a444915a877a54c23ea17cdb8
+x-api-key: 53d84271643d694e28291a281535610ec2442e0549449158dfd3f093add782809b8e8808f86881c9f351a99b574f778451688dfe9daa0742fbfea811fece640b
 
 {
     "name":"Store Shoes",

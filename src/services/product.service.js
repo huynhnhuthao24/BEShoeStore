@@ -85,15 +85,6 @@ class ProductFactory {
     return await findAllPublishProduct({ query, limit, skip });
   }
 
-  // search Product
-  static async findAllDraftStore({ product_store, limit = 50, skip = 0 }) {
-    const query = {
-      product_store,
-      isDraft: true,
-    };
-    return await findAllDraftStore({ query, limit, skip });
-  }
-
   static async searchProducts({ keyWord }) {
     return await searchProduct({ keyWord });
   }
