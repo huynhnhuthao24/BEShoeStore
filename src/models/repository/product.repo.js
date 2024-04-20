@@ -4,12 +4,10 @@ const { getSelectData, unSelectData } = require("../../utils");
 const { product } = require("../product.model");
 const { Types } = require("mongoose");
 
-const findAllDraftStore = async ({ query, limit = 50, skip = 0 }) => {
-  const test = await queryProduct({ query, limit, skip });
-  console.log("test", test);
+const findAllDraftStore = async ({ query, limit = 6, skip = 0 }) => {
   return await queryProduct({ query, limit, skip });
 };
-const findAllPublishProduct = async ({ query, limit = 50, skip = 0 }) => {
+const findAllPublishProduct = async ({ query, limit = 6, skip = 0 }) => {
   return await queryProduct({ query, limit, skip });
 };
 const publishOrUnPublishProduct = async ({
@@ -37,10 +35,10 @@ const queryProduct = async ({ query, limit, skip }) => {
   const data = await product
     .find(query)
     // .populate("product_store", "name email -_id")
-    .sort({
-      updateAt: -1,
-    })
-    .skip(skip)
+    // .sort({
+    //   updateAt: -1,
+    // })
+    .skip(skip * limit)
     .limit(limit)
     .lean()
     .exec();

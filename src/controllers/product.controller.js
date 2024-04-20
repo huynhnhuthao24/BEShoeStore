@@ -27,6 +27,8 @@ class ProductController {
       message: "Lấy sản phẩm thành công",
       metadata: await ProductService.findAllDraftStore({
         product_store: req.keyStore.user,
+        limit: req.query.limit,
+        skip: req.query.pageIndex,
       }),
     }).send(res);
   };

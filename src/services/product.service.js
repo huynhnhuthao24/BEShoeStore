@@ -69,7 +69,7 @@ class ProductFactory {
   }
 
   // query
-  static async findAllDraftStore({ product_store, limit = 50, skip = 0 }) {
+  static async findAllDraftStore({ product_store, limit = 6, skip = 0 }) {
     const query = {
       product_store,
       isDraft: true,
